@@ -1,0 +1,971 @@
+"use client";
+
+import Link from "next/link";
+import { useRef } from "react";
+import { useRouter } from "next/navigation";
+
+import {
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Gift,
+  Heart,
+  ShoppingCart,
+  Star,
+} from "lucide-react";
+
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import Breadcrumb from "@/components/Breadcrumb";
+
+/* =========================================
+   TYPES
+========================================= */
+
+interface CartProduct {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  image?: string;
+}
+
+interface BirthdayProduct {
+  id: number;
+  name: string;
+  price: number;
+}
+
+/* =========================================
+   BIRTHDAY GIFT RECIPIENTS
+========================================= */
+
+const recipients = [
+  {
+    name: "For Her",
+    emoji: "👩",
+    href: "/birthday?recipient=her",
+  },
+  {
+    name: "For Him",
+    emoji: "👨",
+    href: "/birthday?recipient=him",
+  },
+  {
+    name: "For Kids",
+    emoji: "🧒",
+    href: "/birthday?recipient=kids",
+  },
+  {
+    name: "For Wife",
+    emoji: "👰",
+    href: "/birthday?recipient=wife",
+  },
+  {
+    name: "For Husband",
+    emoji: "🤵",
+    href: "/birthday?recipient=husband",
+  },
+  {
+    name: "For Girlfriend",
+    emoji: "💝",
+    href: "/birthday?recipient=girlfriend",
+  },
+  {
+    name: "For Boyfriend",
+    emoji: "💙",
+    href: "/birthday?recipient=boyfriend",
+  },
+  {
+    name: "For Mother",
+    emoji: "👩‍👧",
+    href: "/birthday?recipient=mother",
+  },
+  {
+    name: "For Father",
+    emoji: "👨‍👧",
+    href: "/birthday?recipient=father",
+  },
+  {
+    name: "For Friends",
+    emoji: "🫂",
+    href: "/birthday?recipient=friends",
+  },
+];
+
+/* =========================================
+   AGE PERFECT GIFTS
+========================================= */
+
+const ageGroups = [
+  {
+    title: "1st Birthday",
+    subtitle: "Little one's first celebration",
+    href: "/birthday?age=1",
+  },
+  {
+    title: "10th Birthday",
+    subtitle: "Double digit memories",
+    href: "/birthday?age=10",
+  },
+  {
+    title: "18th Birthday",
+    subtitle: "A special milestone",
+    href: "/birthday?age=18",
+  },
+  {
+    title: "21st Birthday",
+    subtitle: "Celebrate a new chapter",
+    href: "/birthday?age=21",
+  },
+  {
+    title: "30th Birthday",
+    subtitle: "Cheers to a new decade",
+    href: "/birthday?age=30",
+  },
+  {
+    title: "50th Birthday",
+    subtitle: "Golden memories",
+    href: "/birthday?age=50",
+  },
+];
+
+/* =========================================
+   BIRTHDAY ESSENTIALS
+========================================= */
+
+const birthdayCategories = [
+  {
+    name: "Cakes",
+    href: "/birthday?category=cakes",
+  },
+  {
+    name: "Flowers",
+    href: "/birthday?category=flowers",
+  },
+  {
+    name: "Flower & Cakes",
+    href: "/birthday?category=flowers-cakes",
+  },
+
+  /* =========================================
+     PERSONALIZED GIFTS
+
+     REDIRECTS TO PERSONALIZED PAGE
+  ========================================= */
+
+  {
+    name: "Personalised Gifts",
+    href: "/personalised",
+  },
+
+  {
+    name: "Plants",
+    href: "/birthday?category=plants",
+  },
+  {
+    name: "Combos",
+    href: "/birthday?category=combos",
+  },
+  {
+    name: "Chocolates",
+    href: "/birthday?category=chocolates",
+  },
+
+  /* =========================================
+     BIRTHDAY HAMPERS
+
+     CURRENTLY REDIRECTS TO MAIN HAMPERS PAGE.
+
+     IN FUTURE YOU CAN CHANGE THIS TO:
+
+     /hampers?category=birthday
+
+     OR
+
+     /birthday-hampers
+
+     WHEN YOU CREATE A SPECIFIC PAGE.
+  ========================================= */
+
+  {
+    name: "Gift Hampers",
+    href: "/hampers",
+  },
+
+  {
+    name: "Greeting Cards",
+    href: "/birthday?category=cards",
+  },
+  {
+    name: "Premium Gifts",
+    href: "/birthday?category=premium",
+  },
+];
+
+/* =========================================
+   UNIQUE BIRTHDAY GIFTS
+========================================= */
+
+const uniqueGifts = [
+  {
+    name: "Spiritual Gifts",
+    icon: "🪔",
+    href: "/birthday?type=spiritual",
+  },
+  {
+    name: "Jewellery",
+    icon: "💎",
+    href: "/birthday?type=jewellery",
+  },
+  {
+    name: "Experiential Gifts",
+    icon: "🎟️",
+    href: "/birthday?type=experience",
+  },
+  {
+    name: "Electronics",
+    icon: "🎧",
+    href: "/birthday?type=electronics",
+  },
+  {
+    name: "Exotic Flowers",
+    icon: "🌺",
+    href: "/birthday?type=flowers",
+  },
+  {
+    name: "Toys & Games",
+    icon: "🧸",
+    href: "/birthday?type=toys",
+  },
+];
+
+/* =========================================
+   BUDGET OPTIONS
+========================================= */
+
+const budgetOptions = [
+  {
+    title: "Under ₹500",
+    subtitle: "Small surprises",
+    href: "/birthday?budget=500",
+  },
+  {
+    title: "₹500 - ₹1000",
+    subtitle: "Thoughtful gifts",
+    href: "/birthday?budget=1000",
+  },
+  {
+    title: "₹1000 - ₹2000",
+    subtitle: "Special moments",
+    href: "/birthday?budget=2000",
+  },
+  {
+    title: "Above ₹2000",
+    subtitle: "Premium gifting",
+    href: "/birthday?budget=premium",
+  },
+];
+
+/* =========================================
+   FEATURED PRODUCTS
+
+   ADD REAL PRODUCTS HERE LATER
+========================================= */
+
+const featuredProducts: BirthdayProduct[] = [
+  {
+    id: 101,
+    name: "Personalised Birthday Photo Frame",
+    price: 999,
+  },
+  {
+    id: 102,
+    name: "Premium Birthday Gift Hamper",
+    price: 1499,
+  },
+  {
+    id: 103,
+    name: "Luxury Chocolate Gift Box",
+    price: 799,
+  },
+  {
+    id: 104,
+    name: "Birthday Flower Bouquet",
+    price: 1299,
+  },
+];
+
+/* =========================================
+   BIRTHDAY PAGE
+========================================= */
+
+export default function BirthdayPage() {
+  const router = useRouter();
+
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+
+  /* =========================================
+     HORIZONTAL SCROLL FUNCTION
+  ========================================= */
+
+  const scrollCategories = (
+    direction: "left" | "right"
+  ) => {
+    if (!categoryScrollRef.current) return;
+
+    categoryScrollRef.current.scrollBy({
+      left: direction === "right" ? 350 : -350,
+      behavior: "smooth",
+    });
+  };
+
+  /* =========================================
+     ADD PRODUCT TO CART
+
+     IMPORTANT:
+     FROM NOW ON, USE THIS SAME LOGIC
+     FOR ALL "ADD TO CART" BUTTONS.
+  ========================================= */
+
+  const addToCart = (product: BirthdayProduct) => {
+    const storedCart =
+      localStorage.getItem("gift4u-cart");
+
+    let cart: CartProduct[] = storedCart
+      ? JSON.parse(storedCart)
+      : [];
+
+    const existingProduct = cart.find(
+      (item) => item.id === product.id
+    );
+
+    /* =========================================
+       IF PRODUCT ALREADY EXISTS
+       INCREASE QUANTITY
+    ========================================= */
+
+    if (existingProduct) {
+      cart = cart.map((item) =>
+        item.id === product.id
+          ? {
+              ...item,
+              quantity: item.quantity + 1,
+            }
+          : item
+      );
+    } else {
+      /* =========================================
+         ADD NEW PRODUCT
+      ========================================= */
+
+      cart.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+      });
+    }
+
+    /* =========================================
+       SAVE CART
+    ========================================= */
+
+    localStorage.setItem(
+      "gift4u-cart",
+      JSON.stringify(cart)
+    );
+
+    /* =========================================
+       UPDATE HEADER CART COUNT
+    ========================================= */
+
+    window.dispatchEvent(
+      new Event("cartUpdated")
+    );
+
+    /* =========================================
+       SAVE MESSAGE FOR CART PAGE
+
+       CART PAGE WILL DISPLAY THIS
+       AS A BOTTOM POPUP.
+    ========================================= */
+
+    sessionStorage.setItem(
+      "gift4u-cart-toast",
+      `${product.name} added to cart`
+    );
+
+    /* =========================================
+       REDIRECT USER TO CART PAGE
+    ========================================= */
+
+    router.push("/cart");
+  };
+
+  return (
+    <>
+      {/* =========================================
+          HEADER
+      ========================================= */}
+
+      <Header />
+
+      {/* =========================================
+          BREADCRUMB
+      ========================================= */}
+
+      <Breadcrumb currentPage="Birthday" />
+
+      <main>
+        {/* =========================================
+            HERO SECTION
+        ========================================= */}
+
+        <section className="px-4 py-5 lg:px-8">
+          <div className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl bg-[#fff6f9]">
+
+            {/* =========================================
+                ADD BIRTHDAY HERO BACKGROUND IMAGE HERE
+
+                EXAMPLE:
+
+                style={{
+                  backgroundImage:
+                    "url('/images/birthday-hero.jpg')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+
+                PUT YOUR IMAGE INSIDE:
+
+                public/images/
+
+                EXAMPLE:
+
+                public/images/birthday-hero.jpg
+            ========================================= */}
+
+            <div className="relative min-h-[430px] px-7 py-14 sm:px-12 lg:px-16 lg:py-20">
+              <div className="relative z-10 max-w-xl">
+                <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#d92f66]">
+                  Celebrate Every Year
+                </p>
+
+                <h1 className="gift-heading mt-4 text-5xl font-bold leading-tight text-[#172033] sm:text-6xl">
+                  Make Every Birthday
+
+                  <span className="block text-[#d92f66]">
+                    Unforgettable.
+                  </span>
+                </h1>
+
+                <p className="mt-6 text-lg leading-8 text-[#667085]">
+                  From cakes and flowers to personalised
+                  surprises, discover thoughtful gifts for
+                  every birthday celebration.
+                </p>
+
+                <Link
+                  href="#birthday-gifts"
+                  className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#d92f66] px-7 py-3.5 font-semibold text-white transition hover:bg-[#bd1d52]"
+                >
+                  Explore Birthday Gifts
+
+                  <ArrowRight size={18} />
+                </Link>
+              </div>
+
+              {/* =========================================
+                  HERO IMAGE AREA
+
+                  ADD YOUR BACKGROUND IMAGE
+                  TO THE MAIN DIV ABOVE.
+
+                  NO IMAGE IS USED CURRENTLY.
+              ========================================= */}
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================
+            SHOP BY RECIPIENT
+        ========================================= */}
+
+        <section className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
+          <div className="mb-7 flex items-end justify-between">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#d92f66]">
+                Birthday Gifts For
+              </p>
+
+              <h2 className="gift-heading mt-2 text-3xl font-bold text-[#172033] sm:text-4xl">
+                Who Are You Celebrating?
+              </h2>
+            </div>
+
+            <Link
+              href="/birthday"
+              className="hidden text-sm font-bold text-[#d92f66] hover:underline sm:block"
+            >
+              View All →
+            </Link>
+          </div>
+
+          <div className="overflow-x-auto pb-3 scrollbar-hide">
+            <div className="flex min-w-max gap-5">
+              {recipients.map((recipient) => (
+                <Link
+                  key={recipient.name}
+                  href={recipient.href}
+                  className="group flex w-[115px] flex-col items-center"
+                >
+                  {/* =========================================
+                      RECIPIENT IMAGE PLACEHOLDER
+
+                      ADD IMAGE HERE LATER.
+
+                      REPLACE THE EMOJI WITH:
+
+                      <img
+                        src="/images/example.jpg"
+                        alt={recipient.name}
+                        className="h-full w-full object-cover"
+                      />
+                  ========================================= */}
+
+                  <div className="flex h-[105px] w-[105px] items-center justify-center overflow-hidden rounded-full border border-[#f0dfe6] bg-[#fff6f9] text-4xl transition duration-300 group-hover:-translate-y-1 group-hover:border-[#d92f66] group-hover:shadow-lg">
+                    {recipient.emoji}
+                  </div>
+
+                  <p className="mt-3 text-center text-sm font-bold text-[#172033] group-hover:text-[#d92f66]">
+                    {recipient.name}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================
+            SHOP BY AGE
+        ========================================= */}
+
+        <section className="bg-[#fff6f9] py-14">
+          <div className="mx-auto max-w-7xl px-4 lg:px-8">
+            <div className="mb-8">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#d92f66]">
+                Age Perfect Gifts
+              </p>
+
+              <h2 className="gift-heading mt-2 text-3xl font-bold text-[#172033] sm:text-4xl">
+                Celebrate Every Milestone
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+              {ageGroups.map((age) => (
+                <Link
+                  key={age.title}
+                  href={age.href}
+                  className="group rounded-2xl border border-[#f0dfe6] bg-white p-5 transition hover:-translate-y-1 hover:border-[#d92f66] hover:shadow-lg"
+                >
+                  {/* =========================================
+                      ADD AGE CATEGORY IMAGE HERE LATER
+                  ========================================= */}
+
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#fff0f5] text-xl">
+                    🎂
+                  </div>
+
+                  <h3 className="mt-4 text-base font-bold text-[#172033] group-hover:text-[#d92f66]">
+                    {age.title}
+                  </h3>
+
+                  <p className="mt-2 text-xs leading-5 text-[#667085]">
+                    {age.subtitle}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================
+            BIRTHDAY ESSENTIALS
+        ========================================= */}
+
+        <section className="mx-auto max-w-7xl px-4 py-14 lg:px-8">
+          <div className="mb-7">
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#d92f66]">
+              Must Haves
+            </p>
+
+            <h2 className="gift-heading mt-2 text-3xl font-bold text-[#172033] sm:text-4xl">
+              Birthday Essentials
+            </h2>
+          </div>
+
+          <div className="relative">
+            {/* =========================================
+                LEFT SCROLL ARROW
+            ========================================= */}
+
+            <button
+              type="button"
+              aria-label="Scroll left"
+              onClick={() =>
+                scrollCategories("left")
+              }
+              className="absolute left-0 top-1/2 z-10 hidden -translate-y-1/2 rounded-full border border-[#f0dfe6] bg-white p-3 shadow-lg transition hover:text-[#d92f66] md:flex"
+            >
+              <ChevronLeft size={20} />
+            </button>
+
+            {/* =========================================
+                RIGHT SCROLL ARROW
+            ========================================= */}
+
+            <button
+              type="button"
+              aria-label="Scroll right"
+              onClick={() =>
+                scrollCategories("right")
+              }
+              className="absolute right-0 top-1/2 z-10 flex -translate-y-1/2 rounded-full border border-[#f0dfe6] bg-white p-3 shadow-lg transition hover:text-[#d92f66]"
+            >
+              <ChevronRight size={20} />
+            </button>
+
+            <div
+              ref={categoryScrollRef}
+              className="overflow-x-auto px-1 pb-4 scrollbar-hide"
+            >
+              <div className="flex min-w-max gap-5">
+                {birthdayCategories.map(
+                  (category) => (
+                    <Link
+                      key={category.name}
+                      href={category.href}
+                      className="group w-[170px] overflow-hidden rounded-2xl border border-[#f0dfe6] bg-white transition hover:-translate-y-1 hover:border-[#d92f66] hover:shadow-lg"
+                    >
+                      {/* =========================================
+                          ADD CATEGORY IMAGE HERE
+
+                          REPLACE THIS PLACEHOLDER
+                          WITH YOUR IMAGE LATER.
+
+                          EXAMPLE:
+
+                          <img
+                            src="/images/category.jpg"
+                            alt={category.name}
+                            className="h-full w-full object-cover"
+                          />
+                      ========================================= */}
+
+                      <div className="flex aspect-[4/3] items-center justify-center bg-[#fff6f9] p-4 text-center text-sm font-semibold text-[#667085]">
+                        Add Image
+                      </div>
+
+                      <div className="p-4">
+                        <h3 className="font-bold text-[#172033] group-hover:text-[#d92f66]">
+                          {category.name}
+                        </h3>
+
+                        <p className="mt-1 text-xs text-[#667085]">
+                          Explore gifts →
+                        </p>
+                      </div>
+                    </Link>
+                  )
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================
+            GIFTS BEYOND ORDINARY
+
+            ALL ITEMS HAVE SAME OVAL SHAPE
+        ========================================= */}
+
+        <section className="bg-[#fff6f9] py-14">
+          <div className="mx-auto max-w-7xl px-4 lg:px-8">
+            <div className="mb-8">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#d92f66]">
+                Unique Gifting
+              </p>
+
+              <h2 className="gift-heading mt-2 text-3xl font-bold text-[#172033] sm:text-4xl">
+                Gifts Beyond Ordinary
+              </h2>
+            </div>
+
+            {/* =========================================
+                ALL OVAL SHAPES
+            ========================================= */}
+
+            <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
+              {uniqueGifts.map((gift) => (
+                <Link
+                  key={gift.name}
+                  href={gift.href}
+                  className="group flex min-h-[170px] flex-col items-center justify-center rounded-[999px] border border-[#f0dfe6] bg-white p-5 text-center transition hover:-translate-y-1 hover:border-[#d92f66] hover:shadow-lg"
+                >
+                  {/* =========================================
+                      ADD GIFT IMAGE HERE LATER
+
+                      CURRENTLY USING ICON.
+
+                      REPLACE THIS ICON WITH IMAGE
+                      WHEN YOU ARE READY.
+                  ========================================= */}
+
+                  <div className="text-4xl">
+                    {gift.icon}
+                  </div>
+
+                  <h3 className="mt-4 text-sm font-bold text-[#172033] group-hover:text-[#d92f66]">
+                    {gift.name}
+                  </h3>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================
+            FEATURED BIRTHDAY GIFTS
+        ========================================= */}
+
+        <section
+          id="birthday-gifts"
+          className="mx-auto max-w-7xl px-4 py-14 lg:px-8"
+        >
+          <div className="mb-8 flex items-end justify-between">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#d92f66]">
+                Prime Picks
+              </p>
+
+              <h2 className="gift-heading mt-2 text-3xl font-bold text-[#172033] sm:text-4xl">
+                Trending Birthday Gifts
+              </h2>
+
+              <p className="mt-3 text-[#667085]">
+                Handpicked gifts to make their
+                birthday extra special.
+              </p>
+            </div>
+
+            <Link
+              href="/birthday"
+              className="hidden text-sm font-bold text-[#d92f66] hover:underline sm:block"
+            >
+              View All →
+            </Link>
+          </div>
+
+          {/* =========================================
+              SAME SIZE AS HOMEPAGE
+              NEWLY LAUNCHED SECTION
+          ========================================= */}
+
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {featuredProducts.map((product) => (
+              <article
+                key={product.id}
+                className="overflow-hidden rounded-2xl border border-[#f0dfe6] bg-white transition hover:-translate-y-1 hover:shadow-xl"
+              >
+                <div className="relative aspect-square overflow-hidden bg-[#fff6f9]">
+
+                  {/* =========================================
+                      ADD PRODUCT IMAGE HERE
+
+                      REPLACE THIS DIV WITH:
+
+                      <img
+                        src="/images/product.jpg"
+                        alt={product.name}
+                        className="h-full w-full object-cover"
+                      />
+                  ========================================= */}
+
+                  <div className="flex h-full w-full items-center justify-center text-center text-sm font-semibold text-[#667085]">
+                    Add Product Image
+                  </div>
+
+                  <button
+                    type="button"
+                    aria-label={`Add ${product.name} to wishlist`}
+                    className="absolute right-3 top-3 rounded-full bg-white p-2.5 shadow-sm transition hover:text-[#d92f66]"
+                  >
+                    <Heart size={18} />
+                  </button>
+                </div>
+
+                <div className="p-5">
+                  <div className="flex items-center gap-1 text-sm font-semibold text-[#172033]">
+                    <Star
+                      size={15}
+                      className="fill-[#f5aa18] text-[#f5aa18]"
+                    />
+
+                    4.8
+
+                    <span className="ml-1 font-normal text-[#667085]">
+                      (120)
+                    </span>
+                  </div>
+
+                  <h3 className="mt-2 text-lg font-bold text-[#172033]">
+                    {product.name}
+                  </h3>
+
+                  <p className="mt-3 text-xl font-bold text-[#172033]">
+                    ₹{product.price}
+                  </p>
+
+                  {/* =========================================
+                      ADD TO CART
+
+                      1. ADD PRODUCT TO CART
+                      2. UPDATE CART COUNT
+                      3. SAVE POPUP MESSAGE
+                      4. REDIRECT TO /cart
+                  ========================================= */}
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      addToCart(product)
+                    }
+                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-[#d92f66] px-4 py-3 font-semibold text-white transition hover:bg-[#bd1d52]"
+                  >
+                    <ShoppingCart size={18} />
+
+                    Add to Cart
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* =========================================
+            SHOP BY BUDGET
+        ========================================= */}
+
+        <section className="bg-[#fff6f9] py-14">
+          <div className="mx-auto max-w-7xl px-4 lg:px-8">
+            <div className="mb-8">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#d92f66]">
+                Price Wise Gifts
+              </p>
+
+              <h2 className="gift-heading mt-2 text-3xl font-bold text-[#172033] sm:text-4xl">
+                Gifts For Every Budget
+              </h2>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {budgetOptions.map((budget) => (
+                <Link
+                  key={budget.title}
+                  href={budget.href}
+                  className="group relative overflow-hidden rounded-2xl border border-[#f0dfe6] bg-white p-6 transition hover:-translate-y-1 hover:border-[#d92f66] hover:shadow-lg"
+                >
+                  <div className="absolute right-[-15px] top-[-15px] h-20 w-20 rounded-full bg-[#fff0f5]" />
+
+                  <Gift
+                    size={30}
+                    className="relative text-[#d92f66]"
+                  />
+
+                  <h3 className="relative mt-5 text-lg font-bold text-[#172033] group-hover:text-[#d92f66]">
+                    {budget.title}
+                  </h3>
+
+                  <p className="relative mt-2 text-sm text-[#667085]">
+                    {budget.subtitle}
+                  </p>
+
+                  <span className="relative mt-5 inline-block text-sm font-bold text-[#d92f66]">
+                    Shop Now →
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================
+            PERSONALIZED BIRTHDAY GIFTS BANNER
+
+            CLICKING THE COMPLETE BANNER
+            REDIRECTS TO:
+
+            /personalised
+        ========================================= */}
+
+        <section className="px-4 py-14 lg:px-8">
+          <Link
+            href="/personalised"
+            className="group mx-auto block max-w-7xl overflow-hidden rounded-3xl"
+          >
+            <div className="relative min-h-[320px] bg-[#fff0f5] p-8 sm:p-12 lg:p-16">
+
+              {/* =========================================
+                  ADD PERSONALIZED GIFTS
+                  BACKGROUND IMAGE HERE
+
+                  EXAMPLE:
+
+                  style={{
+                    backgroundImage:
+                      "url('/images/personalised-banner.jpg')",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+
+                  PUT IMAGE IN:
+
+                  public/images/
+
+              ========================================= */}
+
+              <div className="relative z-10 max-w-md">
+                <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#d92f66]">
+                  Make It Personal
+                </p>
+
+                <h2 className="gift-heading mt-3 text-4xl font-bold text-[#172033]">
+                  Personalised Birthday Gifts
+                </h2>
+
+                <p className="mt-4 text-[#667085]">
+                  Turn memories into meaningful gifts
+                  with a special personal touch.
+                </p>
+
+                <span className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#d92f66] px-6 py-3 font-semibold text-white transition group-hover:bg-[#bd1d52]">
+                  Explore Personalised Gifts
+
+                  <ArrowRight size={18} />
+                </span>
+              </div>
+            </div>
+          </Link>
+        </section>
+      </main>
+
+      {/* =========================================
+          FOOTER
+      ========================================= */}
+
+      <Footer />
+    </>
+  );
+}
