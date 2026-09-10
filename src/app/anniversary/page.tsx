@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
+import Image from "next/image";
 
 import {
   ArrowRight,
@@ -299,108 +300,129 @@ export default function AnniversaryPage() {
 
       <main>
 
-        {/* =================================================
-            HERO SECTION
+       {/* =================================================
+    HERO SECTION
 
-            =================================================
+    ANNIVERSARY HERO BACKGROUND IMAGE
 
-            HERO IMAGE PLACEHOLDER
+    Image location:
 
-            Later add your hero image inside:
+    public/images/anniversary/anniversary-hero.png
 
-            public/images/anniversary/
+    The image is used as a full background.
 
-            Example:
+    Text is displayed on top of the image.
 
-            public/images/anniversary/anniversary-hero.jpg
+    ================================================= */}
 
-            =================================================
+<section className="bg-[#fff6f9]">
+  <div className="mx-auto max-w-7xl px-4 py-10 lg:px-8 lg:py-14">
 
-            TO ADD A BACKGROUND IMAGE:
+    {/* =============================================
+        HERO BANNER
+        ============================================= */}
 
-            You can replace the placeholder area with:
+    <div className="relative min-h-[520px] overflow-hidden rounded-[2.5rem] border border-[#f0dfe6] sm:min-h-[600px] lg:min-h-[620px]">
 
-            <img
-              src="/images/anniversary/anniversary-hero.jpg"
-              alt="Anniversary Gifts"
-              className="h-full w-full object-cover"
-            />
+      {/* =============================================
+          BACKGROUND IMAGE
 
-            ================================================= */}
+          Image path:
 
-        <section className="bg-[#fff6f9]">
-          <div className="mx-auto max-w-7xl px-4 py-14 lg:px-8 lg:py-20">
+          public/images/anniversary/anniversary-hero.png
+          ============================================= */}
 
-            <div className="grid items-center gap-10 lg:grid-cols-2">
+      <Image
+        src="/images/anniversary/anniversary-hero.png"
+        alt="Anniversary gifts with roses and gift boxes"
+        fill
+        priority
+        className="object-cover"
+      />
 
-              {/* =========================================
-                  HERO TEXT
-                  ========================================= */}
 
-              <div>
-                <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#d92f66]">
-                  Celebrate Love & Memories
-                </p>
+      {/* =============================================
+          LIGHT OVERLAY
 
-                <h1 className="gift-heading mt-4 text-5xl font-bold leading-tight text-[#172033] sm:text-6xl">
-                  Gifts for Every
-                  <span className="block text-[#d92f66]">
-                    Anniversary.
-                  </span>
-                </h1>
+          This overlay improves text readability.
 
-                <p className="mt-6 max-w-xl text-lg leading-8 text-[#667085]">
-                  Celebrate beautiful memories, unforgettable
-                  milestones and the special bond you share
-                  with thoughtful anniversary gifts.
-                </p>
+          The left side remains lighter so the
+          dark text is clearly visible.
 
-                <Link
-                  href="#anniversary-gifts"
-                  className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#d92f66] px-7 py-3.5 font-semibold text-white transition hover:bg-[#bd1d52]"
-                >
-                  Explore Anniversary Gifts
+          ============================================= */}
 
-                  <ArrowRight size={19} />
-                </Link>
-              </div>
+      <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/50 to-transparent" />
 
-              {/* =========================================
-                  HERO IMAGE PLACEHOLDER
 
-                  ADD HERO IMAGE HERE LATER
+      {/* =============================================
+          HERO CONTENT
+          ============================================= */}
 
-                  Recommended location:
+      <div className="relative z-10 flex min-h-[520px] items-center px-7 py-12 sm:px-12 lg:min-h-[620px] lg:px-20">
 
-                  public/images/anniversary/
+        <div className="max-w-2xl">
 
-                  Recommended file name:
+          {/* SMALL HEADING */}
 
-                  anniversary-hero.jpg
+          <p className="text-sm font-bold uppercase tracking-[0.22em] text-[#b52b55] sm:text-base">
+            Celebrate Love & Memories
+          </p>
 
-                  ========================================= */}
 
-              <div className="relative min-h-[320px] overflow-hidden rounded-[2.5rem] border border-[#f0dfe6] bg-[#f8e8ee] sm:min-h-[400px]">
+          {/* MAIN HEADING */}
 
-                <div className="absolute inset-0 flex items-center justify-center p-6 text-center">
-                  <div>
-                    <Heart
-                      size={45}
-                      className="mx-auto mb-4 text-[#d92f66]"
-                    />
+          <h1 className="gift-heading mt-5 text-5xl font-bold leading-[1.05] text-[#172033] sm:text-6xl lg:text-7xl">
 
-                    <p className="font-bold text-[#667085]">
-                      Add Anniversary Hero Image Here
-                    </p>
-                  </div>
-                </div>
+            Gifts for Every
 
-              </div>
+            <span className="mt-2 block text-[#d92f66]">
+              Anniversary.
+            </span>
 
-            </div>
+          </h1>
 
-          </div>
-        </section>
+
+          {/* DESCRIPTION */}
+
+          <p className="mt-7 max-w-xl text-base leading-8 text-[#4b5565] sm:text-lg">
+
+            Celebrate beautiful memories, unforgettable
+            milestones and the special bond you share
+            with thoughtful anniversary gifts.
+
+          </p>
+
+
+          {/* BUTTON */}
+
+          <Link
+            href="#anniversary-gifts"
+            className="mt-9 inline-flex items-center gap-3 rounded-full bg-[#d92f66] px-7 py-4 text-base font-semibold text-white shadow-lg transition duration-300 hover:-translate-y-1 hover:bg-[#bd1d52]"
+          >
+
+            Explore Anniversary Gifts
+
+            <ArrowRight size={20} />
+
+          </Link>
+
+        </div>
+
+      </div>
+
+
+      {/* =============================================
+          OPTIONAL BOTTOM GRADIENT
+
+          Adds a subtle premium appearance.
+          ============================================= */}
+
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/10 to-transparent" />
+
+    </div>
+
+  </div>
+</section>
 
 
         {/* =================================================
