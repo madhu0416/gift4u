@@ -48,43 +48,43 @@ const weddingEvents = [
   {
     name: "Engagement",
     href: "/wedding?event=engagement",
-    image: "",
+    image: "/images/wedding/engagement.jpg.png",
     icon: Gem,
   },
   {
     name: "Haldi",
     href: "/wedding?event=haldi",
-    image: "",
+    image: "/images/wedding/haldi.jpg.png",
     icon: Sparkles,
   },
   {
     name: "Mehendi",
     href: "/wedding?event=mehendi",
-    image: "",
+    image: "/images/wedding/mehendi.jpg.png",
     icon: Heart,
   },
   {
     name: "Sangeet",
     href: "/wedding?event=sangeet",
-    image: "",
+    image: "/images/wedding/sangeet.jpg.png",
     icon: Music,
   },
   {
     name: "Wedding",
     href: "/wedding?event=wedding",
-    image: "",
+    image: "/images/wedding/wedding.jpg.png",
     icon: Gift,
   },
   {
     name: "Reception",
     href: "/wedding?event=reception",
-    image: "",
+    image: "/images/wedding/reception.jpg.png",
     icon: Sparkles,
   },
   {
     name: "Post-Wedding",
     href: "/wedding?event=post-wedding",
-    image: "",
+    image: "/images/wedding/post-weeding.jpg.png",
     icon: Cake,
   },
 ];
@@ -116,52 +116,52 @@ const weddingCategories = [
   {
     name: "Jewellery & Accessories",
     href: "/wedding?category=jewellery",
-    image: "",
+    image: "/images/wedding/Jewellery & Accessories.png",
   },
   {
     name: "Wedding Clothing",
     href: "/wedding?category=clothing",
-    image: "",
+    image: "/images/wedding/Wedding Clothing.png",
   },
   {
     name: "Home & Furniture",
     href: "/wedding?category=home",
-    image: "",
+    image: "/images/wedding/Home & Furniture.png",
   },
   {
     name: "Kitchen & Dining",
     href: "/wedding?category=kitchen",
-    image: "",
+    image: "/images/wedding/Kitchen & Dining.png",
   },
   {
     name: "Gift Hampers",
     href: "/wedding?category=hampers",
-    image: "",
+    image: "/images/wedding/Gift Hampers.png",
   },
   {
     name: "Traditional Gifts",
     href: "/wedding?category=traditional",
-    image: "",
+    image: "/images/wedding/Traditional Gifts.png",
   },
   {
     name: "Personalised Gifts",
     href: "/wedding?category=personalised",
-    image: "",
+    image: "/images/wedding/Personalised Gifts.png",
   },
   {
     name: "Flowers & Bouquets",
     href: "/wedding?category=flowers",
-    image: "",
+    image: "/images/wedding/Flowers & Bouquets.png",
   },
   {
     name: "Beauty & Self-Care",
     href: "/wedding?category=beauty",
-    image: "",
+    image: "/images/wedding/Beauty & Self-Care.png",
   },
   {
     name: "Wedding Decor",
     href: "/wedding?category=decor",
-    image: "",
+    image: "/images/wedding/Wedding Decor.png",
   },
 ];
 
@@ -296,32 +296,32 @@ const stateFilters = [
   {
     name: "Maharashtra",
     href: "/wedding?state=Maharashtra",
-    image: "",
+    image: "/images/wedding/maharashtra.jpg.png",
   },
   {
     name: "Punjab",
     href: "/wedding?state=Punjab",
-    image: "",
+    image: "/images/wedding/punjab.jpg.png",
   },
   {
     name: "Rajasthan",
     href: "/wedding?state=Rajasthan",
-    image: "",
+    image: "/images/wedding/rajasthan.jpg.png",
   },
   {
     name: "Gujarat",
     href: "/wedding?state=Gujarat",
-    image: "",
+    image: "/images/wedding/gujarat.jpg.png",
   },
   {
     name: "Tamil Nadu",
     href: "/wedding?state=Tamil-Nadu",
-    image: "",
+    image: "/images/wedding/tamil-nadu.jpg.png",
   },
   {
     name: "West Bengal",
     href: "/wedding?state=West-Bengal",
-    image: "",
+    image: "/images/wedding/west-bengal.jpg.png",
   },
 ];
 
