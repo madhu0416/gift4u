@@ -14,6 +14,7 @@ import {
   Music,
   Sparkles,
   Wallet,
+  ArrowRight,
 } from "lucide-react";
 
 import Footer from "@/components/Footer";
@@ -1100,158 +1101,134 @@ export default function WeddingPage() {
       <main>
 
 
-        {/* =================================================
-            HERO SECTION
-
-            IMPORTANT:
-
-            The background image belongs ONLY
-            to this Hero section.
-
-            It does NOT extend to the other sections.
-            ================================================= */}
-
         <section className="px-4 py-6 lg:px-8">
+  <div
+    className="
+      relative
+      mx-auto
+      max-w-7xl
+      overflow-hidden
+      rounded-3xl
+      shadow-xl
+    "
+  >
+    {/* HERO BACKGROUND IMAGE */}
+    <img
+      src="/images/wedding/wedding-hero.jpg"
+      alt="Wedding Gifts"
+      className="
+        absolute
+        inset-0
+        h-full
+        w-full
+        object-cover
+        object-center
+      "
+    />
 
-          <div
-            className="
-              relative
-              mx-auto
-              max-w-7xl
-              overflow-hidden
-              rounded-3xl
-            "
-          >
+    {/* DARK GRADIENT OVERLAY */}
+    <div
+      className="
+        absolute
+        inset-0
+        bg-gradient-to-r
+        from-black/80
+        via-black/50
+        to-black/10
+      "
+    />
 
+    {/* HERO CONTENT */}
+    <div
+      className="
+        relative
+        z-10
+        flex
+        min-h-[450px]
+        items-center
+        px-6
+        py-16
+        sm:px-12
+        lg:min-h-[520px]
+        lg:px-16
+      "
+    >
+      <div className="max-w-2xl">
+        {/* SMALL HEADING */}
+        <p
+          className="
+            text-sm
+            font-bold
+            uppercase
+            tracking-[0.18em]
+            text-[#f7c6d5]
+          "
+        >
+          The Gift4U Wedding Edit
+        </p>
 
-            {/* =============================================
-                HERO BACKGROUND IMAGE
+        {/* MAIN HEADING */}
+        <h1
+          className="
+            gift-heading
+            mt-4
+            text-5xl
+            font-bold
+            leading-tight
+            text-white
+            sm:text-6xl
+            lg:text-7xl
+          "
+        >
+          Celebrate Their
+          <span className="block text-[#f5a6bd]">
+            Forever.
+          </span>
+        </h1>
 
-                PUT YOUR HERO IMAGE HERE:
+        {/* DESCRIPTION */}
+        <p
+          className="
+            mt-6
+            max-w-xl
+            text-base
+            leading-8
+            text-white/90
+            sm:text-lg
+          "
+        >
+          From meaningful keepsakes to elegant wedding hampers,
+          discover thoughtful gifts that celebrate love, memories,
+          and the beginning of a beautiful forever.
+        </p>
 
-                public/images/wedding-hero.jpg
-
-                Change the src below if you use
-                another filename.
-                ============================================= */}
-
-            <img
-              src="/images/wedding-hero.jpg"
-              alt="Wedding Gifts"
-              className="
-                absolute
-                inset-0
-                h-full
-                w-full
-                object-cover
-              "
-            />
-
-
-            {/* DARK OVERLAY */}
-
-            <div className="absolute inset-0 bg-black/40" />
-
-
-            {/* HERO CONTENT */}
-
-            <div
-              className="
-                relative
-                z-10
-                flex
-                min-h-[450px]
-                items-center
-                px-6
-                py-16
-
-                sm:px-12
-
-                lg:min-h-[500px]
-                lg:px-16
-              "
-            >
-
-              <div className="max-w-2xl">
-
-
-                {/* SMALL HEADING */}
-
-                <p
-                  className="
-                    text-sm
-                    font-bold
-                    uppercase
-                    tracking-[0.18em]
-                    text-white/90
-                  "
-                >
-                  The Gift4U Wedding Edit
-                </p>
-
-
-                {/* MAIN HEADING */}
-
-                <h1
-                  className="
-                    gift-heading
-                    mt-4
-                    text-5xl
-                    font-bold
-                    leading-tight
-                    text-white
-
-                    sm:text-6xl
-                  "
-                >
-                  Celebrate Their Forever.
-                </h1>
-
-
-                {/* DESCRIPTION */}
-
-                <p
-                  className="
-                    mt-5
-                    max-w-2xl
-                    text-lg
-                    leading-8
-                    text-white/90
-                  "
-                >
-                  From meaningful keepsakes to grand wedding hampers,
-                  find a gift that feels as special as their new beginning.
-                </p>
-
-
-                {/* BUTTON */}
-
-                <Link
-                  href="#wedding-gifts"
-                  className="
-                    mt-8
-                    inline-flex
-                    rounded-full
-                    bg-[#d92f66]
-                    px-6
-                    py-3.5
-                    font-semibold
-                    text-white
-                    transition
-                    hover:bg-[#bd1d52]
-                  "
-                >
-                  Explore Wedding Gifts
-                </Link>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </section>
-
+        {/* BUTTON */}
+        <Link
+          href="#wedding-gifts"
+          className="
+            mt-8
+            inline-flex
+            items-center
+            justify-center
+            rounded-full
+            bg-[#d92f66]
+            px-7
+            py-3.5
+            font-semibold
+            text-white
+            shadow-lg
+            transition
+            duration-300
+            hover:bg-[#bd1d52]
+            hover:scale-105
+          "
+        >
+          Explore Wedding Gifts
+        </Link>
+      </div>
+    </div>
+  </div>
+</section>
 
 
         {/* =================================================

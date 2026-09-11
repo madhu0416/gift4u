@@ -16,6 +16,7 @@ import {
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useWishlist } from "@/contexts/WishlistContext";
 
 /* =========================================================
    TYPES
@@ -162,6 +163,35 @@ const personalFor = [
 ========================================================= */
 
 export default function PersonalisedPage() {
+  /* =========================================================
+     GLOBAL WISHLIST
+  ========================================================= */
+
+  const {
+    addToWishlist,
+    removeFromWishlist,
+    isInWishlist,
+  } = useWishlist();
+
+  /* =========================================================
+     TOGGLE WISHLIST
+  ========================================================= */
+
+  const toggleWishlist = (product: Product) => {
+    const wishlistId = String(product.id);
+
+    if (isInWishlist(wishlistId)) {
+      removeFromWishlist(wishlistId);
+    } else {
+      addToWishlist({
+        id: wishlistId,
+        name: product.name,
+        price: product.price,
+        category: product.category,
+      });
+    }
+  };
+
   /* =========================================================
      ADD PRODUCT TO CART
   ========================================================= */
@@ -919,9 +949,11 @@ export default function PersonalisedPage() {
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
 
 
-              {personalisedProducts.map((product) => (
+              {personalisedProducts.map((product) => {
+                const isWishlisted = isInWishlist(String(product.id));
 
-                <article
+                return (
+                  <article
                   key={product.id}
                   className="group overflow-hidden rounded-2xl border border-[#f0dfe6] bg-white transition duration-300 hover:-translate-y-1 hover:shadow-xl"
                 >
@@ -1001,11 +1033,23 @@ export default function PersonalisedPage() {
 
                     <button
                       type="button"
-                      aria-label={`Add ${product.name} to wishlist`}
-                      className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#172033] shadow-sm transition hover:text-[#d92f66]"
+                      onClick={() => toggleWishlist(product)}
+                      aria-label={
+                        isWishlisted
+                          ? `Remove ${product.name} from wishlist`
+                          : `Add ${product.name} to wishlist`
+                      }
+                      className={`absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm transition ${
+                        isWishlisted
+                          ? "text-[#d92f66]"
+                          : "text-[#172033] hover:text-[#d92f66]"
+                      }`}
                     >
 
-                      <Heart size={18} />
+                      <Heart
+                        size={18}
+                        fill={isWishlisted ? "currentColor" : "none"}
+                      />
 
                     </button>
 
@@ -1070,7 +1114,8 @@ export default function PersonalisedPage() {
 
                 </article>
 
-              ))}
+                );
+              })}
 
             </div>
 
@@ -1085,7 +1130,7 @@ export default function PersonalisedPage() {
             CREATIVE STEP DESIGN
         ===================================================== */}
 
-        <section className="bg-[#172033] py-16 text-white">
+        <section className="theme-dark-section bg-[#172033] py-16 text-white">
 
           <div className="mx-auto max-w-7xl px-4 lg:px-8">
 

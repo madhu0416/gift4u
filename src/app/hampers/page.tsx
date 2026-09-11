@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
 import {
   ArrowRight,
-  ChevronLeft,
-  ChevronRight,
+  Flower2,
   Gift,
   Heart,
   Package,
@@ -16,6 +16,8 @@ import {
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+
+import { useWishlist } from "@/contexts/WishlistContext";
 
 /* =========================================================
    TYPES
@@ -28,6 +30,10 @@ type Product = {
   oldPrice?: number;
   rating: number;
   category: string;
+};
+
+type CartProduct = Product & {
+  quantity: number;
 };
 
 /* =========================================================
@@ -123,12 +129,6 @@ const hamperCollections = [
 
 /* =========================================================
    FLORAL GIFT SETS
-
-   This section remains after removing:
-
-   Explore Collections
-   Featured Gift Sets
-
    ========================================================= */
 
 const floralGiftSets = [
@@ -187,6 +187,54 @@ export default function HampersPage() {
   const router = useRouter();
 
   /* =======================================================
+     WISHLIST CONTEXT
+
+     Global wishlist functionality.
+
+     Products added here will appear on:
+
+     /wishlist
+
+     ======================================================= */
+
+  const {
+    addToWishlist,
+    removeFromWishlist,
+    isInWishlist,
+  } = useWishlist();
+
+  /* =======================================================
+     TOGGLE WISHLIST
+
+     If product is already in wishlist:
+     → Remove it
+
+     If product is not in wishlist:
+     → Add it
+
+     IMPORTANT:
+
+     String(product.id) is used because
+     the global wishlist uses string IDs.
+
+     ======================================================= */
+
+  const handleWishlist = (product: Product) => {
+    const productId = String(product.id);
+
+    if (isInWishlist(productId)) {
+      removeFromWishlist(productId);
+    } else {
+      addToWishlist({
+        id: productId,
+        name: product.name,
+        price: product.price,
+        category: product.category,
+      });
+    }
+  };
+
+  /* =======================================================
      ADD TO CART TOAST
      ======================================================= */
 
@@ -205,22 +253,27 @@ export default function HampersPage() {
         align-items: center;
         justify-content: center;
         background: #d92f66;
+        font-weight: bold;
       ">
         ✓
       </div>
 
       <div>
-        <div style="font-weight:700;">
+
+        <div style="
+          font-weight: 700;
+        ">
           Added to Cart
         </div>
 
         <div style="
-          font-size:12px;
-          opacity:0.75;
-          margin-top:2px;
+          font-size: 12px;
+          opacity: 0.75;
+          margin-top: 2px;
         ">
           Your gift has been added successfully
         </div>
+
       </div>
     `;
 
@@ -229,6 +282,7 @@ export default function HampersPage() {
     setTimeout(() => {
       toast.style.transition = "all 0.3s ease";
       toast.style.opacity = "0";
+
       toast.style.transform =
         "translateX(-50%) translateY(20px)";
 
@@ -241,16 +295,22 @@ export default function HampersPage() {
   /* =======================================================
      ADD PRODUCT TO CART
 
-     Cart data is stored in localStorage.
-
-     The cart page can read this same data.
+     1. Get existing cart
+     2. Check product
+     3. Increase quantity if existing
+     4. Add if new
+     5. Save localStorage
+     6. Update Header cart count
+     7. Show popup
+     8. Redirect to Cart
 
      ======================================================= */
 
   const handleAddToCart = (product: Product) => {
-    const existingCart = localStorage.getItem("gift4u-cart");
+    const existingCart =
+      localStorage.getItem("gift4u-cart");
 
-    let cartItems: Array<Product & { quantity: number }> = [];
+    let cartItems: CartProduct[] = [];
 
     if (existingCart) {
       try {
@@ -260,9 +320,10 @@ export default function HampersPage() {
       }
     }
 
-    const existingProductIndex = cartItems.findIndex(
-      (item) => item.id === product.id
-    );
+    const existingProductIndex =
+      cartItems.findIndex(
+        (item) => item.id === product.id
+      );
 
     if (existingProductIndex !== -1) {
       cartItems[existingProductIndex].quantity += 1;
@@ -278,27 +339,17 @@ export default function HampersPage() {
       JSON.stringify(cartItems)
     );
 
-    /*
-      Dispatch event.
-
-      Header can listen to this event
-      and update cart count immediately.
-    */
+    /* Update Header cart count */
 
     window.dispatchEvent(
       new Event("cartUpdated")
     );
 
-    /* Show popup at bottom */
+    /* Show popup */
 
     showAddedToCart();
 
-    /*
-      Redirect to Cart after popup.
-
-      Small delay allows the user
-      to see the confirmation popup.
-    */
+    /* Redirect to Cart */
 
     setTimeout(() => {
       router.push("/cart");
@@ -320,6 +371,7 @@ export default function HampersPage() {
             =================================================== */}
 
         <section className="border-b border-[#f0dfe6] bg-white">
+
           <div className="mx-auto max-w-7xl px-4 py-4 lg:px-8">
 
             <div className="flex items-center gap-2 text-sm text-[#667085]">
@@ -340,7 +392,9 @@ export default function HampersPage() {
             </div>
 
           </div>
+
         </section>
+
 
         {/* ===================================================
             HERO SECTION
@@ -358,6 +412,7 @@ export default function HampersPage() {
                 TO ADD IMAGE LATER:
 
                 STEP 1:
+
                 Add image inside:
 
                 public/images/hampers/
@@ -369,16 +424,13 @@ export default function HampersPage() {
 
                 STEP 2:
 
-                Add this image:
+                Replace the placeholder below with:
 
                 <img
                   src="/images/hampers/hamper-hero.jpg"
                   alt="Gift Hampers"
                   className="absolute inset-0 h-full w-full object-cover"
                 />
-
-                You can also add a dark overlay
-                above the image if required.
 
                 =============================================== */}
 
@@ -394,11 +446,13 @@ export default function HampersPage() {
 
             </div>
 
+
             {/* Decorative Shapes */}
 
             <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[#f3c9d7] opacity-60" />
 
             <div className="absolute -bottom-28 left-1/2 h-64 w-64 rounded-full bg-[#f5dbe4] opacity-70" />
+
 
             {/* Hero Content */}
 
@@ -409,25 +463,32 @@ export default function HampersPage() {
               </p>
 
               <h1 className="gift-heading mt-4 text-4xl font-bold text-[#172033] sm:text-5xl lg:text-6xl">
+
                 Gift Hampers
+
                 <span className="block text-[#d92f66]">
                   Made to Delight
                 </span>
+
               </h1>
 
               <p className="mt-5 max-w-2xl text-base leading-8 text-[#667085] sm:text-lg">
+
                 Beautifully curated hampers filled with
                 thoughtful surprises, delicious treats and
                 unforgettable memories.
+
               </p>
 
               <Link
                 href="#featured-hampers"
                 className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#d92f66] px-6 py-3.5 font-semibold text-white transition hover:bg-[#bd1d52]"
               >
+
                 Explore Hampers
 
                 <ArrowRight size={19} />
+
               </Link>
 
             </div>
@@ -435,6 +496,7 @@ export default function HampersPage() {
           </div>
 
         </section>
+
 
         {/* ===================================================
             FEATURED HAMPERS
@@ -460,14 +522,15 @@ export default function HampersPage() {
               href="/hampers"
               className="hidden items-center gap-1 text-sm font-bold text-[#d92f66] sm:flex"
             >
+
               View All
 
               <ArrowRight size={16} />
+
             </Link>
 
           </div>
 
-          {/* Horizontal Scroll */}
 
           <div className="relative">
 
@@ -484,8 +547,6 @@ export default function HampersPage() {
                   className="group min-w-[190px] flex-1 rounded-2xl border border-[#f0dfe6] bg-white p-5 transition hover:-translate-y-1 hover:shadow-lg"
                 >
 
-                  {/* Different Shapes */}
-
                   <div
                     className={`flex h-14 w-14 items-center justify-center bg-[#fff1f5] text-[#d92f66]
                     ${
@@ -493,7 +554,7 @@ export default function HampersPage() {
                         ? "rounded-full"
                         : index % 3 === 1
                         ? "rounded-2xl"
-                        : "rounded-[1.4rem] rotate-6"
+                        : "rotate-6 rounded-[1.4rem]"
                     }`}
                   >
 
@@ -519,6 +580,7 @@ export default function HampersPage() {
 
         </section>
 
+
         {/* ===================================================
             HAMPER COLLECTIONS
             =================================================== */}
@@ -538,76 +600,77 @@ export default function HampersPage() {
               </h2>
 
               <p className="mt-3 max-w-2xl text-[#667085]">
+
                 Discover carefully selected hampers designed
                 to bring happiness to every special occasion.
+
               </p>
 
             </div>
 
-            {/* Collections */}
 
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
 
-              {hamperCollections.map((collection, index) => (
+              {hamperCollections.map(
+                (collection, index) => (
 
-                <Link
-                  key={collection.name}
-                  href="/hampers"
-                  className="group relative overflow-hidden rounded-[1.8rem] border border-[#f0dfe6] bg-[#fff6f9] p-6 transition hover:-translate-y-1 hover:bg-white hover:shadow-xl"
-                >
-
-                  {/* Decorative Shape */}
-
-                  <div
-                    className={`absolute -right-6 -top-6 h-24 w-24 bg-[#f6d8e2] opacity-60
-                    ${
-                      index % 2 === 0
-                        ? "rounded-full"
-                        : "rounded-[2rem]"
-                    }`}
-                  />
-
-                  <div className="relative">
+                  <Link
+                    key={collection.name}
+                    href="/hampers"
+                    className="group relative overflow-hidden rounded-[1.8rem] border border-[#f0dfe6] bg-[#fff6f9] p-6 transition hover:-translate-y-1 hover:bg-white hover:shadow-xl"
+                  >
 
                     <div
-                      className={`flex h-12 w-12 items-center justify-center text-[#d92f66]
+                      className={`absolute -right-6 -top-6 h-24 w-24 bg-[#f6d8e2] opacity-60
                       ${
-                        index % 3 === 0
-                          ? "rounded-full bg-[#ffeaf1]"
-                          : index % 3 === 1
-                          ? "rounded-xl bg-[#fbe2eb]"
-                          : "rounded-[1.2rem] bg-[#fff]"
+                        index % 2 === 0
+                          ? "rounded-full"
+                          : "rounded-[2rem]"
                       }`}
-                    >
+                    />
 
-                      <Package size={21} />
+                    <div className="relative">
+
+                      <div
+                        className={`flex h-12 w-12 items-center justify-center text-[#d92f66]
+                        ${
+                          index % 3 === 0
+                            ? "rounded-full bg-[#ffeaf1]"
+                            : index % 3 === 1
+                            ? "rounded-xl bg-[#fbe2eb]"
+                            : "rounded-[1.2rem] bg-white"
+                        }`}
+                      >
+
+                        <Package size={21} />
+
+                      </div>
+
+                      <h3 className="mt-5 text-lg font-bold text-[#172033]">
+                        {collection.name}
+                      </h3>
+
+                      <p className="mt-2 text-sm leading-6 text-[#667085]">
+                        {collection.description}
+                      </p>
+
+                      <div className="mt-5 flex items-center gap-2 text-sm font-bold text-[#d92f66]">
+
+                        Explore
+
+                        <ArrowRight
+                          size={17}
+                          className="transition-transform group-hover:translate-x-1"
+                        />
+
+                      </div>
 
                     </div>
 
-                    <h3 className="mt-5 text-lg font-bold text-[#172033]">
-                      {collection.name}
-                    </h3>
+                  </Link>
 
-                    <p className="mt-2 text-sm leading-6 text-[#667085]">
-                      {collection.description}
-                    </p>
-
-                    <div className="mt-5 flex items-center gap-2 text-sm font-bold text-[#d92f66]">
-
-                      Explore
-
-                      <ArrowRight
-                        size={17}
-                        className="transition-transform group-hover:translate-x-1"
-                      />
-
-                    </div>
-
-                  </div>
-
-                </Link>
-
-              ))}
+                )
+              )}
 
             </div>
 
@@ -615,36 +678,21 @@ export default function HampersPage() {
 
         </section>
 
+
         {/* ===================================================
-            BEAUTIFULLY CURATED
             FLORAL GIFT SETS
-
-            IMPORTANT:
-
-            This section has been moved UP.
-
-            The previous section:
-
-            "Explore Collections"
-            "Featured Gift Sets"
-
-            has been COMPLETELY REMOVED.
-
             =================================================== */}
 
         <section className="mx-auto max-w-7xl px-4 py-16 lg:px-8">
 
           <div className="relative overflow-hidden rounded-[2rem] bg-[#172033] px-6 py-10 sm:px-10 lg:px-14 lg:py-14">
 
-            {/* Decorative Background */}
-
             <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#d92f66] opacity-20" />
 
             <div className="absolute -bottom-32 left-1/3 h-64 w-64 rounded-full bg-white opacity-5" />
 
-            <div className="relative z-10">
 
-              {/* Heading */}
+            <div className="relative z-10">
 
               <div className="mb-10 max-w-2xl">
 
@@ -663,13 +711,14 @@ export default function HampersPage() {
                 </h2>
 
                 <p className="mt-4 text-base leading-7 text-[#c6cedd]">
+
                   Beautiful flowers combined with thoughtful
                   gifts to create unforgettable moments.
+
                 </p>
 
               </div>
 
-              {/* Floral Gift Sets */}
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
@@ -681,8 +730,6 @@ export default function HampersPage() {
                     className="group rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm transition hover:-translate-y-1 hover:bg-white/10"
                   >
 
-                    {/* Shape */}
-
                     <div
                       className={`flex h-11 w-11 items-center justify-center text-[#f6b4c8]
                       ${
@@ -690,11 +737,11 @@ export default function HampersPage() {
                           ? "rounded-full bg-white/10"
                           : index % 3 === 1
                           ? "rounded-xl bg-white/10"
-                          : "rounded-[1rem] bg-white/10 rotate-3"
+                          : "rotate-3 rounded-[1rem] bg-white/10"
                       }`}
                     >
 
-                      <Heart size={19} />
+                      <Flower2 size={19} />
 
                     </div>
 
@@ -729,6 +776,7 @@ export default function HampersPage() {
 
         </section>
 
+
         {/* ===================================================
             FEATURED PRODUCTS
             =================================================== */}
@@ -758,163 +806,230 @@ export default function HampersPage() {
                 href="/hampers"
                 className="hidden items-center gap-1 text-sm font-bold text-[#d92f66] sm:flex"
               >
+
                 View All
 
                 <ArrowRight size={16} />
+
               </Link>
 
             </div>
 
-            {/* Product Grid */}
+
+            {/* PRODUCT GRID */}
 
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
 
-              {hamperProducts.map((product) => (
+              {hamperProducts.map((product) => {
 
-                <article
-                  key={product.id}
-                  className="group overflow-hidden rounded-2xl border border-[#f0dfe6] bg-white transition hover:-translate-y-1 hover:shadow-xl"
-                >
+                /* ===========================================
+                   CHECK WISHLIST STATUS
+                   =========================================== */
 
-                  {/* =========================================
-                      PRODUCT IMAGE PLACEHOLDER
+                const productInWishlist =
+                  isInWishlist(String(product.id));
 
-                      ADD PRODUCT IMAGE HERE LATER.
+                return (
 
-                      STEP 1:
+                  <article
+                    key={product.id}
+                    className="group overflow-hidden rounded-2xl border border-[#f0dfe6] bg-white transition hover:-translate-y-1 hover:shadow-xl"
+                  >
 
-                      Add image inside:
+                    {/* =========================================
+                        PRODUCT IMAGE PLACEHOLDER
 
-                      public/images/hampers/
+                        ADD PRODUCT IMAGE HERE LATER.
+
+                        STEP 1:
+
+                        Add image inside:
+
+                        public/images/hampers/
 
 
-                      STEP 2:
+                        Example:
 
-                      Replace this placeholder with:
+                        public/images/hampers/
+                        luxury-celebration-hamper.jpg
 
-                      <img
-                        src="/images/hampers/your-image.jpg"
-                        alt="Product Name"
-                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                      />
 
-                      ========================================= */}
+                        STEP 2:
 
-                  <div className="relative aspect-square overflow-hidden bg-[#f8e8ee]">
+                        Replace the placeholder below with:
 
-                    <div className="flex h-full w-full items-center justify-center p-5 text-center">
+                        <img
+                          src="/images/hampers/your-image.jpg"
+                          alt="Product Name"
+                          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                        />
 
-                      <span className="text-sm font-semibold text-[#8d7580]">
-                        {product.name} Image
+                        ========================================= */}
+
+                    <div className="relative aspect-square overflow-hidden bg-[#f8e8ee]">
+
+                      <div className="flex h-full w-full items-center justify-center p-5 text-center">
+
+                        <span className="text-sm font-semibold text-[#8d7580]">
+                          {product.name} Image
+                        </span>
+
+                      </div>
+
+
+                      {/* =====================================
+                          WISHLIST BUTTON
+
+                          Click:
+                          → Add to Wishlist
+
+                          Click again:
+                          → Remove from Wishlist
+
+                          ===================================== */}
+
+                      <button
+                        type="button"
+
+                        aria-label={
+                          productInWishlist
+                            ? `Remove ${product.name} from wishlist`
+                            : `Add ${product.name} to wishlist`
+                        }
+
+                        onClick={() =>
+                          handleWishlist(product)
+                        }
+
+                        className={`absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md transition hover:scale-105
+                        ${
+                          productInWishlist
+                            ? "text-[#d92f66]"
+                            : "text-[#172033] hover:text-[#d92f66]"
+                        }`}
+                      >
+
+                        <Heart
+                          size={18}
+
+                          fill={
+                            productInWishlist
+                              ? "currentColor"
+                              : "none"
+                          }
+                        />
+
+                      </button>
+
+
+                      {/* CATEGORY BADGE */}
+
+                      <span className="absolute bottom-3 left-3 rounded-full bg-[#172033] px-3 py-1 text-xs font-semibold text-white">
+
+                        {product.category}
+
                       </span>
 
                     </div>
 
-                    {/* Wishlist */}
 
-                    <button
-                      type="button"
-                      aria-label={`Add ${product.name} to wishlist`}
-                      className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#172033] shadow-md transition hover:text-[#d92f66]"
-                    >
+                    {/* PRODUCT INFORMATION */}
 
-                      <Heart size={18} />
+                    <div className="p-5">
 
-                    </button>
+                      {/* RATING */}
 
-                    {/* Category Badge */}
+                      <div className="flex items-center gap-1">
 
-                    <span className="absolute bottom-3 left-3 rounded-full bg-[#172033] px-3 py-1 text-xs font-semibold text-white">
+                        <Star
+                          size={15}
+                          className="fill-[#f5aa18] text-[#f5aa18]"
+                        />
 
-                      {product.category}
+                        <span className="text-sm font-bold text-[#172033]">
+                          {product.rating}
+                        </span>
 
-                    </span>
+                        <span className="text-xs text-[#667085]">
+                          (120)
+                        </span>
 
-                  </div>
+                      </div>
 
-                  {/* Product Information */}
 
-                  <div className="p-5">
+                      {/* PRODUCT NAME */}
 
-                    <div className="flex items-center gap-1">
+                      <h3 className="mt-3 text-lg font-bold text-[#172033]">
 
-                      <Star
-                        size={15}
-                        className="fill-[#f5aa18] text-[#f5aa18]"
-                      />
+                        {product.name}
 
-                      <span className="text-sm font-bold text-[#172033]">
-                        {product.rating}
-                      </span>
+                      </h3>
 
-                      <span className="text-xs text-[#667085]">
-                        (120)
-                      </span>
 
-                    </div>
+                      {/* PRICE */}
 
-                    <h3 className="mt-3 text-lg font-bold text-[#172033]">
+                      <div className="mt-4 flex items-center gap-2">
 
-                      {product.name}
+                        <span className="text-xl font-bold text-[#172033]">
 
-                    </h3>
-
-                    <div className="mt-4 flex items-center gap-2">
-
-                      <span className="text-xl font-bold text-[#172033]">
-
-                        ₹{product.price}
-
-                      </span>
-
-                      {product.oldPrice && (
-
-                        <span className="text-sm text-[#98a2b3] line-through">
-
-                          ₹{product.oldPrice}
+                          ₹{product.price}
 
                         </span>
 
-                      )}
+
+                        {product.oldPrice && (
+
+                          <span className="text-sm text-[#98a2b3] line-through">
+
+                            ₹{product.oldPrice}
+
+                          </span>
+
+                        )}
+
+                      </div>
+
+
+                      {/* =====================================
+                          ADD TO CART
+
+                          1. Adds product
+                          2. Updates quantity
+                          3. Updates Header cart count
+                          4. Shows popup
+                          5. Redirects to Cart
+
+                          ===================================== */}
+
+                      <button
+                        type="button"
+
+                        onClick={() =>
+                          handleAddToCart(product)
+                        }
+
+                        className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-[#d92f66] px-4 py-3 font-semibold text-white transition hover:bg-[#bd1d52]"
+                      >
+
+                        <ShoppingCart size={18} />
+
+                        Add to Cart
+
+                      </button>
 
                     </div>
 
-                    {/* =====================================
-                        ADD TO CART
+                  </article>
 
-                        PRODUCT IS ADDED TO LOCALSTORAGE.
-
-                        POPUP APPEARS AT BOTTOM.
-
-                        USER IS REDIRECTED TO /cart.
-
-                        ===================================== */}
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleAddToCart(product)
-                      }
-                      className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-[#d92f66] px-4 py-3 font-semibold text-white transition hover:bg-[#bd1d52]"
-                    >
-
-                      <ShoppingCart size={18} />
-
-                      Add to Cart
-
-                    </button>
-
-                  </div>
-
-                </article>
-
-              ))}
+                );
+              })}
 
             </div>
 
           </div>
 
         </section>
+
 
         {/* ===================================================
             PREMIUM HAMPER BANNER
@@ -924,37 +1039,29 @@ export default function HampersPage() {
 
           <div className="relative overflow-hidden rounded-[2rem] bg-[#172033]">
 
+
             {/* ===============================================
                 PREMIUM HAMPER BACKGROUND IMAGE
 
-                ADD IMAGE HERE LATER.
+                Current image location:
 
-                Add image:
-
-                public/images/hampers/premium-hamper-banner.jpg
-
-
-                Replace placeholder with:
-
-                <img
-                  src="/images/hampers/premium-hamper-banner.jpg"
-                  alt="Premium Gift Hampers"
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
+                public/images/hampers/premium-hamper.png
 
                 =============================================== */}
 
-            <div className="absolute inset-0 flex items-center justify-center">
+            <img
+              src="/images/hampers/premium-hamper.png"
+              alt="Premium Gift Hampers"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
 
-              <span className="text-sm font-semibold text-[#8f9aae]">
-                Add Premium Hamper Background Image Here
-              </span>
 
-            </div>
+            {/* DARK OVERLAY */}
 
-            {/* Overlay */}
+            <div className="absolute inset-0 bg-[#172033]/75" />
 
-            <div className="absolute inset-0 bg-[#172033]/90" />
+
+            {/* CONTENT */}
 
             <div className="relative z-10 max-w-2xl px-8 py-16 sm:px-14 sm:py-20">
 
@@ -963,15 +1070,20 @@ export default function HampersPage() {
               </p>
 
               <h2 className="gift-heading mt-4 text-4xl font-bold text-white sm:text-5xl">
+
                 Make Every Gift
+
                 <span className="block text-[#f3a8c0]">
                   Feel Extraordinary
                 </span>
+
               </h2>
 
-              <p className="mt-5 text-lg leading-8 text-[#c6cedd]">
+              <p className="mt-5 text-lg leading-8 text-[#e1e6ef]">
+
                 Discover luxurious hampers carefully designed
                 to make your special moments unforgettable.
+
               </p>
 
               <Link
@@ -993,11 +1105,13 @@ export default function HampersPage() {
 
       </main>
 
+
       {/* =====================================================
           FOOTER
           ===================================================== */}
 
       <Footer />
+
     </>
   );
 }

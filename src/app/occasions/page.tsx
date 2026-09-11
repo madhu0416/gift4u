@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
+import type { RefObject } from "react";
 
 import {
   ArrowLeft,
@@ -19,7 +20,26 @@ import {
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumb from "@/components/Breadcrumb";
+import { useWishlist } from "@/contexts/WishlistContext";
 
+
+type OccasionItem = {
+  name: string;
+  image: string;
+};
+
+type FeaturedProduct = {
+  id: number;
+  name: string;
+  price: number;
+  rating: string;
+  image: string;
+  category: string;
+};
+
+type CartItem = FeaturedProduct & {
+  quantity: number;
+};
 
 /* =====================================================
    POPULAR OCCASIONS
@@ -35,7 +55,7 @@ import Breadcrumb from "@/components/Breadcrumb";
    Keep image: "" if you want the placeholder.
    ===================================================== */
 
-const popularOccasions = [
+const popularOccasions: OccasionItem[] = [
   {
     name: "Ganesh Chaturthi",
     image: "",
@@ -81,7 +101,7 @@ const popularOccasions = [
    image: "/images/occasions/festival.jpg"
    ===================================================== */
 
-const occasionTypes = [
+const occasionTypes: OccasionItem[] = [
   {
     name: "Festivals",
     image: "",
@@ -130,13 +150,14 @@ const occasionTypes = [
    image: "/images/products/diwali-gift-box.jpg"
    ===================================================== */
 
-const featuredProducts = [
+const featuredProducts: FeaturedProduct[] = [
   {
     id: 1,
     name: "Premium Diwali Gift Box",
     price: 1499,
     rating: "4.8",
     image: "",
+    category: "Occasions",
   },
   {
     id: 2,
@@ -144,6 +165,7 @@ const featuredProducts = [
     price: 1299,
     rating: "4.7",
     image: "",
+    category: "Occasions",
   },
   {
     id: 3,
@@ -151,6 +173,7 @@ const featuredProducts = [
     price: 999,
     rating: "4.9",
     image: "",
+    category: "Occasions",
   },
   {
     id: 4,
@@ -158,20 +181,43 @@ const featuredProducts = [
     price: 1899,
     rating: "4.8",
     image: "",
+    category: ""
   },
 ];
 
 
 export default function OccasionsPage() {
+  const {
+    addToWishlist,
+    removeFromWishlist,
+    isInWishlist,
+  } = useWishlist();
+
+  const toggleWishlist = (product: FeaturedProduct) => {
+    const productId = String(product.id);
+
+    if (isInWishlist(productId)) {
+      removeFromWishlist(productId);
+      return;
+    }
+
+    addToWishlist({
+      id: productId,
+      name: product.name,
+      price: product.price,
+      image: product.image || undefined,
+      category: product.category,
+    });
+  };
 
 
   /* ===================================================
      HORIZONTAL SCROLL REFERENCES
      =================================================== */
 
-  const popularRailRef = useRef(null);
+  const popularRailRef = useRef<HTMLDivElement>(null);
 
-  const occasionTypeRailRef = useRef(null);
+  const occasionTypeRailRef = useRef<HTMLDivElement>(null);
 
 
   /* ===================================================
@@ -189,7 +235,10 @@ export default function OccasionsPage() {
      Used for horizontal scrolling.
      =================================================== */
 
-  const scrollRail = (ref, direction) => {
+  const scrollRail = (
+    ref: RefObject<HTMLDivElement | null>,
+    direction: "left" | "right"
+  ) => {
 
     if (!ref.current) return;
 
@@ -217,12 +266,12 @@ export default function OccasionsPage() {
      "gift4u-cart"
      =================================================== */
 
-  const addToCart = (product) => {
+  const addToCart = (product: FeaturedProduct) => {
 
 
     /* Get existing cart */
 
-    const existingCart = JSON.parse(
+    const existingCart: CartItem[] = JSON.parse(
       localStorage.getItem("gift4u-cart") || "[]"
     );
 
@@ -945,11 +994,31 @@ export default function OccasionsPage() {
 
                   <button
                     type="button"
-                    aria-label={`Add ${product.name} to wishlist`}
-                    className="absolute right-3 top-3 rounded-full bg-white p-2.5 text-[#172033] shadow-sm transition hover:text-[#d92f66]"
+                    onClick={() => toggleWishlist(product)}
+                    aria-label={`${
+                      isInWishlist(String(product.id))
+                        ? "Remove"
+                        : "Add"
+                    } ${product.name} ${
+                      isInWishlist(String(product.id))
+                        ? "from"
+                        : "to"
+                    } wishlist`}
+                    className={`absolute right-3 top-3 rounded-full bg-white p-2.5 shadow-sm transition ${
+                      isInWishlist(String(product.id))
+                        ? "text-[#d92f66]"
+                        : "text-[#172033] hover:text-[#d92f66]"
+                    }`}
                   >
 
-                    <Heart size={18} />
+                    <Heart
+                      size={18}
+                      fill={
+                        isInWishlist(String(product.id))
+                          ? "currentColor"
+                          : "none"
+                      }
+                    />
 
                   </button>
 
